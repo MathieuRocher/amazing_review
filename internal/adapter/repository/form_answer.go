@@ -47,7 +47,6 @@ func (r *FormAnswerRepository) FindAllWithPagination(page int, limit int) ([]dom
 	}
 
 	if err := r.db.
-		Preload("FormAnswers").
 		Limit(limit).
 		Offset(offset).
 		Find(&repoFormAnswers).Error; err != nil {
