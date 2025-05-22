@@ -7,17 +7,11 @@ import (
 	"amazing_review/internal/infrastructure/database"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
 func main() {
 	router := gin.Default()
-
-	e := godotenv.Load()
-	if e != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	// DATABASE
 	database.InitDB()
@@ -47,10 +41,14 @@ func main() {
 
 	reviewPort := os.Getenv("REVIEW_PORT")
 	if reviewPort == "" {
-		log.Fatal("REVIEW_PORT must be set in environment")
+		_ = godotenv.Load(".env") // charge localement si pas défini
+		reviewPort = os.Getenv("REVIEW_PORT")
+		if reviewPort == "" {
+			reviewPort = "8082" // fallback si tout échoue
+		}
 	}
 
-	err := router.Run("localhost:" + reviewPort)
+	err := router.Run("0.0.0.0:" + reviewPort)
 	if err != nil {
 		return
 	}
