@@ -6,7 +6,6 @@ import (
 	"amazing_review/internal/adapter/repository"
 	"amazing_review/internal/infrastructure/database"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func main() {
@@ -20,12 +19,7 @@ func main() {
 	service.NewCacheService(c)*/
 
 	// Importation des routes
-	api := router.Group("/api")
-	api.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "hello world",
-		})
-	})
+	api := router.Group("/")
 
 	// FORM ANSWERS
 	formAnswersRepository := repository.NewFormAnswerRepository()
