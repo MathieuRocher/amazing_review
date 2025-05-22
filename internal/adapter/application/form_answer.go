@@ -6,6 +6,7 @@ import (
 
 type FormAnswerUseCaseInterface interface {
 	FindAll() ([]domain.FormAnswer, error)
+	FindAllWithPagination(p int, l int) ([]domain.FormAnswer, error)
 	FindByID(id uint) (*domain.FormAnswer, error)
 	Create(q *domain.FormAnswer) error
 	Update(q *domain.FormAnswer) error
@@ -14,6 +15,7 @@ type FormAnswerUseCaseInterface interface {
 
 type FormAnswerRepositoryInterface interface {
 	FindAll() ([]domain.FormAnswer, error)
+	FindAllWithPagination(p int, l int) ([]domain.FormAnswer, error)
 	FindByID(id uint) (*domain.FormAnswer, error)
 	Create(formAnswer *domain.FormAnswer) error
 	Update(formAnswer *domain.FormAnswer) error
@@ -30,6 +32,10 @@ func NewFormAnswerUseCase(r FormAnswerRepositoryInterface) FormAnswerUseCaseInte
 
 func (uc *FormAnswerUseCase) FindAll() ([]domain.FormAnswer, error) {
 	return uc.repo.FindAll()
+}
+
+func (uc *FormAnswerUseCase) FindAllWithPagination(page int, limit int) ([]domain.FormAnswer, error) {
+	return uc.repo.FindAllWithPagination(page, limit)
 }
 
 func (uc *FormAnswerUseCase) FindByID(id uint) (*domain.FormAnswer, error) {

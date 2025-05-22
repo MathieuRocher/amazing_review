@@ -2,11 +2,13 @@ package application
 
 import (
 	"amazing_review/internal/adapter/handler/dto/review"
+
 	domain "github.com/MathieuRocher/amazing_domain"
 )
 
 type ReviewUseCaseInterface interface {
 	FindAll() ([]domain.Review, error)
+	FindAllWithPagination(p int, l int) ([]domain.Review, error)
 	FindByID(id uint) (*domain.Review, error)
 	Create(input *review.ReviewInput, userID uint) error
 	Update(q *domain.Review) error
@@ -15,6 +17,7 @@ type ReviewUseCaseInterface interface {
 
 type ReviewRepositoryInterface interface {
 	FindAll() ([]domain.Review, error)
+	FindAllWithPagination(p int, l int) ([]domain.Review, error)
 	FindByID(id uint) (*domain.Review, error)
 	Create(review *domain.Review) error
 	Update(review *domain.Review) error
@@ -46,6 +49,10 @@ func NewReviewUseCase(
 }
 func (uc *ReviewUseCase) FindAll() ([]domain.Review, error) {
 	return uc.reviewRepo.FindAll()
+}
+
+func (uc *ReviewUseCase) FindAllWithPagination(page int, limit int) ([]domain.Review, error) {
+	return uc.reviewRepo.FindAllWithPagination(page, limit)
 }
 
 func (uc *ReviewUseCase) FindByID(id uint) (*domain.Review, error) {

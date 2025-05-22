@@ -2,10 +2,11 @@ package handler
 
 import (
 	"amazing_review/internal/adapter/application"
-	domain "github.com/MathieuRocher/amazing_domain"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	domain "github.com/MathieuRocher/amazing_domain"
+	"github.com/gin-gonic/gin"
 )
 
 type FormAnswerHandler struct {
@@ -17,7 +18,29 @@ func NewFormAnswerHandler(uc application.FormAnswerUseCaseInterface) *FormAnswer
 }
 
 func (h *FormAnswerHandler) GetFormAnswers(c *gin.Context) {
-	formAnswers, _ := h.useCase.FindAll()
+	// Récupération des query params
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+	var (
+		formAnswers []domain.FormAnswer
+		err         error
+	)
+
+	if pageStr != "" && limitStr != "" {
+		page, err1 := strconv.Atoi(pageStr)
+		limit, err2 := strconv.Atoi(limitStr)
+
+		if err1 == nil && err2 == nil {
+			// Appel avec pagination
+			formAnswers, err = h.useCase.FindAllWithPagination(page, limit)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}
+	} else {
+		formAnswers, _ = h.useCase.FindAll()
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": formAnswers,

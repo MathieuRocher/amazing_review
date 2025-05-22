@@ -2,6 +2,7 @@ package repository
 
 import (
 	"amazing_review/internal/infrastructure/database"
+
 	domain "github.com/MathieuRocher/amazing_domain"
 	"gorm.io/gorm"
 )
@@ -26,6 +27,30 @@ func NewReviewRepository() *ReviewRepository {
 func (r *ReviewRepository) FindAll() ([]domain.Review, error) {
 	var repoReviews []Review
 	if err := r.db.Preload("FormAnswers").Find(&repoReviews).Error; err != nil {
+		return nil, err
+	}
+
+	var domainReviews []domain.Review
+	for _, repoReview := range repoReviews {
+		domainReviews = append(domainReviews, *repoReview.ToDomain())
+	}
+
+	return domainReviews, nil
+}
+
+func (r *ReviewRepository) FindAllWithPagination(page int, limit int) ([]domain.Review, error) {
+	var repoReviews []Review
+
+	offset := (page - 1) * limit
+	if offset < 0 {
+		offset = 0
+	}
+
+	if err := r.db.
+		Preload("FormAnswers").
+		Limit(limit).
+		Offset(offset).
+		Find(&repoReviews).Error; err != nil {
 		return nil, err
 	}
 

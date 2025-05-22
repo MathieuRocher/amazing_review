@@ -3,9 +3,11 @@ package handler
 import (
 	"amazing_review/internal/adapter/application"
 	"amazing_review/internal/adapter/handler/dto/review"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	domain "github.com/MathieuRocher/amazing_domain"
+	"github.com/gin-gonic/gin"
 )
 
 type ReviewHandler struct {
@@ -17,7 +19,29 @@ func NewReviewHandler(uc application.ReviewUseCaseInterface) *ReviewHandler {
 }
 
 func (h *ReviewHandler) GetReviews(c *gin.Context) {
-	reviews, err := h.useCase.FindAll()
+	// Récupération des query params
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+	var (
+		reviews []domain.Review
+		err     error
+	)
+
+	if pageStr != "" && limitStr != "" {
+		page, err1 := strconv.Atoi(pageStr)
+		limit, err2 := strconv.Atoi(limitStr)
+
+		if err1 == nil && err2 == nil {
+			// Appel avec pagination
+			reviews, err = h.useCase.FindAllWithPagination(page, limit)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}
+	} else {
+		reviews, err = h.useCase.FindAll()
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
